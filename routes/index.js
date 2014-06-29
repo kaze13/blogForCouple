@@ -85,7 +85,7 @@ module.exports = function (app) {
             newUser.save(function (err, user) {
                 if (err) {
                     req.flash('error', err);
-                    return res.redirect('/reg');//注册失败返回主册页
+                    return res.redirect('/');//注册失败返回主册页
                 }
                 req.session.user = user;//用户信息存入 session
                 req.flash('success', 'Registered.');
@@ -107,7 +107,7 @@ module.exports = function (app) {
             //检查密码是否一致
             if (user.password != password) {
                 req.flash('error', 'Wrong password,');
-                return res.redirect('/login');//密码错误则跳转到登录页
+                return res.redirect('/');//密码错误则跳转到登录页
             }
             //用户名密码都匹配后，将用户信息存入 session
             req.session.user = user;
