@@ -102,7 +102,7 @@ module.exports = function (app) {
         User.get(req.body.name, function (err, user) {
             if (!user) {
                 req.flash('error', 'User not exist.');
-                return res.redirect('/login');//用户不存在则跳转到登录页
+                return res.redirect('/');//用户不存在则跳转到登录页
             }
             //检查密码是否一致
             if (user.password != password) {
