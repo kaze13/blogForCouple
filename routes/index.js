@@ -35,7 +35,7 @@ module.exports = function (app) {
                 posts = [];
             }
             res.render('index', {
-                title: '主页',
+                title: 'Hall',
                 posts: posts,
                 page: page,
                 isFirstPage: (page - 1) == 0,
@@ -111,7 +111,7 @@ module.exports = function (app) {
             }
             //用户名密码都匹配后，将用户信息存入 session
             req.session.user = user;
-            req.flash('success', 'Login success.');
+//            req.flash('success', 'Login success.');
             res.redirect('/');//登陆成功后跳转到主页
         });
     });
@@ -136,7 +136,7 @@ module.exports = function (app) {
                 req.flash('error', err);
                 return res.redirect('/');
             }
-            req.flash('success', 'Post success.');
+//            req.flash('success', 'Post success.');
             res.redirect('/');//发表成功跳转到主页
         });
     });
@@ -155,7 +155,7 @@ module.exports = function (app) {
         //检查用户是否存在
         User.get(req.params.name, function (err, user) {
             if (!user) {
-                req.flash('error', '用户不存在!');
+                req.flash('error', 'User does not exist.');
                 return res.redirect('/');
             }
             //查询并返回该用户第 page 页的 10 篇文章
@@ -215,7 +215,7 @@ module.exports = function (app) {
                 req.flash('error', err);
                 return res.redirect('back');
             }
-            req.flash('success', '留言成功!');
+//            req.flash('success', '留言成功!');
             res.redirect('back');
         });
     });
@@ -229,7 +229,7 @@ module.exports = function (app) {
                 return res.redirect('back');
             }
             res.render('edit', {
-                title: '编辑',
+                title: 'Edit',
                 post: post,
                 user: req.session.user,
                 success: req.flash('success').toString(),
@@ -248,7 +248,7 @@ module.exports = function (app) {
                 req.flash('error', err);
                 return res.redirect(url);//出错！返回文章页
             }
-            req.flash('success', '修改成功!');
+//            req.flash('success', '修改成功!');
             res.redirect(url);//成功！返回文章页
         });
     });
@@ -261,7 +261,7 @@ module.exports = function (app) {
                 req.flash('error', err);
                 return res.redirect('back');
             }
-            req.flash('success', '删除成功!');
+//            req.flash('success', '删除成功!');
             res.redirect('/');
         });
     });
@@ -272,7 +272,7 @@ module.exports = function (app) {
                 return res.redirect('/');
             }
             res.render('archive', {
-                title: '存档',
+                title: 'Archive',
                 posts: posts,
                 user: req.session.user,
                 success: req.flash('success').toString(),
@@ -288,7 +288,7 @@ module.exports = function (app) {
                 return res.redirect('/');
             }
             res.render('tags', {
-                title: '标签',
+                title: 'Tags',
                 posts: posts,
                 user: req.session.user,
                 success: req.flash('success').toString(),

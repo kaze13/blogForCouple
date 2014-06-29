@@ -5,18 +5,19 @@
 <a href="/u/<%= post.name %>"><img src="<%= post.head %>" class="r_head" /></a>
 </p>
 <p class="info">
-    作者：<a href="/u/<%= post.name %>"><%= post.name %></a> |
-    日期：<%= post.time.minute %> |
-    标签：
+    Author：<a href="/u/<%= post.name %>"><%= post.name %></a> |
+    Date：<%= post.time.minute %> |
+    Tag：
     <% post.tags.forEach(function (tag, index) { %>
     <% if (tag) { %>
     <a class="tag" href="/tags/<%= tag %>"><%= tag %></a>
     <% } %>
     <% }) %>
 </p>
+
 <p><%- post.post %></p>
-<p class="info">阅读：<%= post.pv %> | 评论：<%= post.comments.length %></p>
+<hr>
+
 <% }) %>
 <%- include paging %>
 <%- include footer %>
-<%- include dialogs %>
