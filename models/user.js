@@ -1,8 +1,9 @@
 /**
  * Created by kaze13 on 2014/6/28.
  */
-//var mongodb = require('./db');
-var mongodb = require('mongodb').Db;
+var mongodb = require('./db');
+//var mongodb = require('mongodb').Db;
+var crypto = require('crypto');
 var settings = require('../settings');
 function User(user) {
     this.name = user.name;
@@ -15,13 +16,17 @@ module.exports = User;
 //存储用户信息
 User.prototype.save = function (callback) {
     //要存入数据库的用户文档
+    var md5 = crypto.createHash('md5');
+    var email_MD5 = md5.update(this.email.toLowerCase()).digest('hex');
+    var head = "http://www.gravatar.com/avatar/" + email_MD5 + "?s=48";
     var user = {
         name: this.name,
         password: this.password,
-        email: this.email
+        email: this.email,
+        head: head
     };
     //打开数据库
-    mongodb.connect(settings.url, function (err, db) {
+    mongodb.open(function (err, db) {
         if (err) {
             return callback(err);//错误，返回 err 信息
         }
@@ -35,7 +40,7 @@ User.prototype.save = function (callback) {
             collection.insert(user, {
                 safe: true
             }, function (err, user) {
-                db.close();
+                mongodb.close();
                 if (err) {
                     return callback(err);//错误，返回 err 信息
                 }
@@ -48,7 +53,7 @@ User.prototype.save = function (callback) {
 //读取用户信息
 User.get = function (name, callback) {
     //打开数据库
-    mongodb.connect(settings.url, function (err, db) {
+    mongodb.open(function (err, db) {
         if (err) {
             return callback(err);//错误，返回 err 信息
         }
@@ -62,7 +67,7 @@ User.get = function (name, callback) {
             collection.findOne({
                 name: name
             }, function (err, user) {
-                db.close();
+                mongodb.close();
                 if (err) {
                     return callback(err);//失败！返回 err 信息
                 }

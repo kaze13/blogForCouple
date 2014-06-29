@@ -1,8 +1,9 @@
 <%- include header %>
-<% posts.forEach(function (post, index) { %>
 <p>
-<h2><a href="/u/<%= post.name %>/<%= post.time.day %>/<%= post.title %>"><%= post.title %></a></h2>
-<a href="/u/<%= post.name %>"><img src="<%= post.head %>" class="r_head" /></a>
+    <% if (user && (user.name == post.name)) { %>
+    <span><a class="edit" href="/edit/<%= post.name %>/<%= post.time.day %>/<%= post.title %>">编辑</a></span>
+    <span><a class="edit" href="/remove/<%= post.name %>/<%= post.time.day %>/<%= post.title %>">删除</a></span>
+    <% } %>
 </p>
 <p class="info">
     作者：<a href="/u/<%= post.name %>"><%= post.name %></a> |
@@ -16,7 +17,5 @@
 </p>
 <p><%- post.post %></p>
 <p class="info">阅读：<%= post.pv %> | 评论：<%= post.comments.length %></p>
-<% }) %>
-<%- include paging %>
+<%- include comment %>
 <%- include footer %>
-<%- include dialogs %>

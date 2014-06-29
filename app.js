@@ -25,10 +25,10 @@ app.use(express.session({
     secret: settings.cookieSecret,
     key: settings.db,//cookie name
     cookie: {maxAge: 1000 * 60 * 60 * 24 * 30},//30 days
-    url: settings.url
-//    store: new MongoStore({
-//        db: settings.db
-//    })
+//    url: settings.url
+    store: new MongoStore({
+        db: settings.db
+    })
 }));
 app.use(app.router);
 app.use(express.static(path.join(__dirname, 'public')));//config for path of js and css
