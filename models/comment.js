@@ -3,6 +3,7 @@
  */
 //var mongodb = require('./db');
 var mongodb = mongodb = require('mongodb').Db;
+var settings = require('../settings');
 
 function Comment(name, day, title, comment) {
     this.name = name;
