@@ -1,9 +1,9 @@
 /**
  * Created by kaze13 on 2014/6/28.
  */
-//var mongodb = require('./db');
-var mongodb = mongodb = require('mongodb').Db;
-var settings = require('../settings');
+var mongodb = require('./db');
+//var mongodb = mongodb = require('mongodb').Db;
+//var settings = require('../settings');
 
 function Comment(name, day, title, comment) {
     this.name = name;
@@ -14,24 +14,20 @@ function Comment(name, day, title, comment) {
 
 module.exports = Comment;
 
-//存储一条留言信息
 Comment.prototype.save = function (callback) {
     var name = this.name,
         day = this.day,
         title = this.title,
         comment = this.comment;
-    //打开数据库
-    mongodb.connect(settings.url, function (err, db) {
+    mongodb.open(function (err, db) {
         if (err) {
             return callback(err);
         }
-        //读取 posts 集合
         db.collection('posts', function (err, collection) {
             if (err) {
-                db.close();
+                mongodb.close();
                 return callback(err);
             }
-            //通过用户名、时间及标题查找文档，并把一条留言对象添加到该文档的 comments 数组里
             collection.update({
                 "name": name,
                 "time.day": day,
@@ -39,7 +35,7 @@ Comment.prototype.save = function (callback) {
             }, {
                 $push: {"comments": comment}
             }, function (err) {
-                db.close();
+                mongodb.close();
                 if (err) {
                     return callback(err);
                 }
