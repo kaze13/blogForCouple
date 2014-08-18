@@ -11,6 +11,8 @@
         "mongodb": "*",
         "connect-mongo": "*",
         "connect-flash": "*",
-        "markdown":"*"
+        "markdown":"*",
+        "mongoose": "*"
+
     }
 }

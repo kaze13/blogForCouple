@@ -1,7 +1,9 @@
 var mongodb = require('./db');
+var mongoose = require('./mongoose');
 //var mongodb = require('mongodb').Db;
 //var settings = require('../settings');
 var markdown = require('markdown').markdown;
+var objectID = require('mongodb').ObjectID;
 
 function Post(name, head, title, tags, post) {
     this.name = name;
@@ -11,7 +13,18 @@ function Post(name, head, title, tags, post) {
     this.post = post;
 }
 
-module.exports = Post;
+var postSchema = new mongoose.Schema({
+    name:String,
+    head:String,
+    title:String,
+    tags:String,
+    post:String
+}, {
+    collection:'posts'
+});
+
+var postModel = mongoose.model('Post', postSchema);
+
 
 Post.prototype.save = function (callback) {
     var date = new Date();
@@ -22,8 +35,8 @@ Post.prototype.save = function (callback) {
         day: date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate(),
         minute: date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " " +
             date.getHours() + ":" + (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes())
-    }
-    var post = {
+    };
+    var post = new postModel({
         name: this.name,
         head: this.head,
         time: time,
@@ -32,27 +45,31 @@ Post.prototype.save = function (callback) {
         post: this.post,
         comments: [],
         pv: 0
-    };
-    mongodb.open(function (err, db) {
-        if (err) {
-            return callback(err);
-        }
-        db.collection('posts', function (err, collection) {
-            if (err) {
-                mongodb.close();
-                return callback(err);
-            }
-            collection.insert(post, {
-                safe: true
-            }, function (err) {
-                mongodb.close();
-                if (err) {
-                    return callback(err);
-                }
-                callback(null);
-            });
-        });
     });
+
+    post.save(function(err, post) {
+        callback(err, post);
+    });
+//    mongodb.open(function (err, db) {
+//        if (err) {
+//            return callback(err);
+//        }
+//        db.collection('posts', function (err, collection) {
+//            if (err) {
+//                mongodb.close();
+//                return callback(err);
+//            }
+//            collection.insert(post, {
+//                safe: true
+//            }, function (err) {
+//                mongodb.close();
+//                if (err) {
+//                    return callback(err);
+//                }
+//                callback(null);
+//            });
+//        });
+//    });
 };
 
 Post.getByCount = function (name, page, count, callback) {
@@ -90,7 +107,7 @@ Post.getByCount = function (name, page, count, callback) {
     });
 };
 
-Post.getOne = function (name, day, title, callback) {
+Post.getOne = function (_id, callback) {
     mongodb.open(function (err, db) {
         if (err) {
             return callback(err);
@@ -101,9 +118,7 @@ Post.getOne = function (name, day, title, callback) {
                 return callback(err);
             }
             collection.findOne({
-                "name": name,
-                "time.day": day,
-                "title": title
+                "_id": new objectID(_id)
             }, function (err, doc) {
                 if (err) {
                     mongodb.close();
@@ -111,9 +126,7 @@ Post.getOne = function (name, day, title, callback) {
                 }
                 if (doc) {
                     collection.update({
-                        "name": name,
-                        "time.day": day,
-                        "title": title
+                        "_id": new objectID(_id)
                     }, {
                         $inc: {"pv": 1}
                     }, function (err) {
@@ -290,31 +303,39 @@ Post.getTags = function (callback) {
 };
 
 Post.search = function (keyword, callback) {
-    mongodb.open(function (err, db) {
-        if (err) {
-            return callback(err);
-        }
-        db.collection('posts', function (err, collection) {
-            if (err) {
-                mongodb.close();
-                return callback(err);
-            }
-            var pattern = new RegExp("^.*" + keyword + ".*$", "i");
-            collection.find({
-                "title": pattern
-            }, {
-                "name": 1,
-                "time": 1,
-                "title": 1
-            }).sort({
-                time: -1
-            }).toArray(function (err, docs) {
-                mongodb.close();
-                if (err) {
-                    return callback(err);
-                }
-                callback(null, docs);
-            });
-        });
+    var pattern = new RegExp("^.*" + keyword + ".*$", "i");
+    postModel.find({title:pattern}, 'name time title').sort({time:-1}).exec(function(err, docs){
+        console.log(docs);
+        callback(err, docs);
     });
+
+//    mongodb.open(function (err, db) {
+//        if (err) {
+//            return callback(err);
+//        }
+//        db.collection('posts', function (err, collection) {
+//            if (err) {
+//                mongodb.close();
+//                return callback(err);
+//            }
+//            var pattern = new RegExp("^.*" + keyword + ".*$", "i");
+//            collection.find({
+//                "title": pattern
+//            }, {
+//                "name": 1,
+//                "time": 1,
+//                "title": 1
+//            }).sort({
+//                time: -1
+//            }).toArray(function (err, docs) {
+//                mongodb.close();
+//                if (err) {
+//                    return callback(err);
+//                }
+//                callback(null, docs);
+//            });
+//        });
+//    });
 };
+
+module.exports = Post;
